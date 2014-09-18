@@ -25,6 +25,16 @@ type Response struct {
 	Tasks    []*Task        `json:"tasks,omitempty"`
 }
 
+//
+type Group struct {
+	ID						string           `json:"id"`
+	Version				string           `json:"version",omitempty`
+	Apps					[]*Application   `json:"apps,omitempty"`
+	Dependencies  []string         `json:"dependencies,omitempty"`
+	Groups				[]*Group         `json:"groups,omitempty"`
+}
+
+
 // Application marathon application see :
 // https://mesosphere.github.io/marathon/docs/rest-api.html#apps
 type Application struct {
