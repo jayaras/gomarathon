@@ -74,7 +74,7 @@ func (c *Client) CreateGroup(group *Group) (*Response, error) {
 }
 
 
-func (c *Client) UpdateGroup(groupID string, group *Group) (*Response, error) {
+func (c *Client) UpdateGroup(groupID string,group *Group) (*Response, error) {
 	options := &RequestOptions{
 		Path:   fmt.Sprintf("groups/%s", groupID),
 		Datas:  group,

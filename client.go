@@ -62,11 +62,12 @@ func (c *Client) do(method, path string, data interface{}) ([]byte, int, error) 
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err = c.HTTPClient.Do(req)
+
 	if err != nil {
 		return nil, -1, err
 	}
 
-	defer resp.Body.Close()
+  defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

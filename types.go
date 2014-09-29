@@ -14,6 +14,7 @@ type Parameters struct {
 	Host        string
 	Scale       bool
 	CallbackURL string
+	Force       bool
 }
 
 // Response representation of a full marathon response
@@ -28,7 +29,7 @@ type Response struct {
 //
 type Group struct {
 	ID						string           `json:"id"`
-	Version				string           `json:"version",omitempty`
+	Version				string           `json:"version,omitempty"`
 	Apps					[]*Application   `json:"apps,omitempty"`
 	Dependencies  []string         `json:"dependencies,omitempty"`
 	Groups				[]*Group         `json:"groups,omitempty"`
@@ -57,6 +58,7 @@ type Application struct {
 	UpgradeStrategy *UpgradeStrategy  `json:"upgradeStrategy,omitempty"`
 	Uris            []string          `json:"uris,omitempty"`
 	Version         string            `json:"version,omitempty"`
+	Dependencies  []string            `json:"dependencies,omitempty"`
 }
 
 // Container is docker parameters
@@ -69,6 +71,15 @@ type Container struct {
 // Docker options
 type Docker struct {
 	Image string `json:"image,omitempty"`
+	Network string `json:"network,omitempty"`
+	PortMappings []PortMapping `json:"portMappings,omitempty"`
+}
+
+//Docker portmapping
+type PortMapping struct {
+  ContainerPort int `json:"containerPort"`
+	HostPort int `json:"hostPort"`
+	Protocol string `json:"protocol"`
 }
 
 // Container volumes
