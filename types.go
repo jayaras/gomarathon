@@ -72,7 +72,7 @@ type Container struct {
 type Docker struct {
 	Image string `json:"image,omitempty"`
 	Network string `json:"network,omitempty"`
-	PortMappings []PortMapping `json:"portMappings,omitempty"`
+	PortMappings []*PortMapping `json:"portMappings,omitempty"`
 }
 
 //Docker portmapping
