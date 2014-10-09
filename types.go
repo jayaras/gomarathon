@@ -80,6 +80,7 @@ type PortMapping struct {
   ContainerPort int `json:"containerPort"`
 	HostPort int `json:"hostPort"`
 	Protocol string `json:"protocol"`
+	ServicePort int `json:"servicePort"`
 }
 
 // Container volumes
