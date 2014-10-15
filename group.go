@@ -90,11 +90,12 @@ func (c *Client) UpdateGroup(groupID string,group *Group) (*Response, error) {
 
 }
 
-// DeleteGroup delete this app from the cluster
-func (c *Client) DeleteGroup(groupID string) (*Response, error) {
+// DeleteGroup delete this group of apps from the cluster
+func (c *Client) DeleteGroup(groupID string,force bool) (*Response, error) {
 	options := &RequestOptions{
 		Path:   fmt.Sprintf("groups/%s", groupID),
 		Method: "DELETE",
+		Params: &Parameters{Force: force},
 	}
 	r, err := c.request(options)
 	if r != nil {
@@ -105,7 +106,12 @@ func (c *Client) DeleteGroup(groupID string) (*Response, error) {
 	return nil, err
 }
 
-// DeleteApp delete this app from the cluster
+func (c *Client) ForceDeleteGroup(groupID string)(*Response, error) {
+	return c.DeleteGroup(groupID,true)
+}
+
+
+// RollbackGroup  rollback group to a previous version
 func (c *Client) RollbackGroup(groupID string, version string) (*Response, error) {
 	options := &RequestOptions{
 		Path:   fmt.Sprintf("groups/%s/version/%s", groupID,version),
