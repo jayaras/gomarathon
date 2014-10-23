@@ -114,6 +114,10 @@ func (c *Client) request(options *RequestOptions) (*Response, error) {
 			v.Set("CallbackURL", url.QueryEscape(options.Params.CallbackURL))
 		}
 
+    if options.Params.Force == true {
+			v.Set("force",url.QueryEscape("true"))
+		}
+
 		path = fmt.Sprintf("%s?%s", path, v.Encode())
 	}
 

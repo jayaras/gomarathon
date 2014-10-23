@@ -14,7 +14,7 @@ type Parameters struct {
 	Host        string
 	Scale       bool
 	CallbackURL string
-	Force       bool
+	Force       bool  `json:"force"`
 }
 
 // Response representation of a full marathon response
@@ -104,6 +104,7 @@ type HealthCheck struct {
 	IntervalSeconds    int    `json:"intervalSeconds,omitempty"`
 	PortIndex          int    `json:"portIndex,omitempty"`
 	TimeoutSeconds     int    `json:"timeoutSeconds,omitempty"`
+	MaxConsecutiveFailures int `json:"maxConsecutiveFailures,omitempty"`
 }
 
 // Task is described here:
