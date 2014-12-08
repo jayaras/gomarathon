@@ -67,7 +67,7 @@ func (c *Client) do(method, path string, data interface{}) ([]byte, int, error) 
 		return nil, -1, err
 	}
 
-  defer resp.Body.Close()
+	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -83,7 +83,7 @@ func (c *Client) do(method, path string, data interface{}) ([]byte, int, error) 
 // request prepare the request by setting the correct methods and parameters
 // TODO:
 // 	- find a better way to build parameters
-func (c *Client) request(options *RequestOptions) (*Response, error) {
+func (c *Client) request(options *RequestOptions, r Response) error {
 
 	if options.Path == "" {
 		options.Path = "apps"
@@ -114,8 +114,8 @@ func (c *Client) request(options *RequestOptions) (*Response, error) {
 			v.Set("CallbackURL", url.QueryEscape(options.Params.CallbackURL))
 		}
 
-    if options.Params.Force == true {
-			v.Set("force",url.QueryEscape("true"))
+		if options.Params.Force == true {
+			v.Set("force", url.QueryEscape("true"))
 		}
 
 		path = fmt.Sprintf("%s?%s", path, v.Encode())
@@ -123,15 +123,14 @@ func (c *Client) request(options *RequestOptions) (*Response, error) {
 
 	data, code, err := c.do(options.Method, path, options.Datas)
 	if err != nil {
-		return nil, err
-	}
-	resp := &Response{
-		Code: code,
+		return err
 	}
 
-	err = json.Unmarshal(data, resp)
+	r.SetCode(code)
+	err = r.UnmarshalJSON(data)
+
 	if err != nil {
-		return resp, err
+		return err
 	}
-	return resp, nil
+	return nil
 }

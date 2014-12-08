@@ -6,7 +6,10 @@ import (
 )
 
 // RegisterCallbackURL register a new callback url
-func (c *Client) RegisterCallbackURL(uri string) (*Response, error) {
+func (c *Client) RegisterCallbackURL(uri string) (*DefaultResponse, error) {
+
+	var r DefaultResponse
+
 	options := &RequestOptions{
 		Path:   "eventSubscriptions",
 		Method: "POST",
@@ -14,32 +17,35 @@ func (c *Client) RegisterCallbackURL(uri string) (*Response, error) {
 			CallbackURL: url.QueryEscape(uri),
 		},
 	}
-	r, err := c.request(options)
-	if r != nil {
-		if r.Code == 201 {
-			return r, nil
+	err := c.request(options, &r)
+	if &r != nil {
+		if r.GetCode() == 201 {
+			return &r, nil
 		}
 	}
 	return nil, err
 }
 
 // GetEventSubscriptions gets all registered callback url
-func (c *Client) GetEventSubscriptions() (*Response, error) {
+func (c *Client) GetEventSubscriptions() (*DefaultResponse, error) {
+	var r DefaultResponse
 	options := &RequestOptions{
 		Path: "eventSubscriptions",
 	}
-	r, err := c.request(options)
+	err := c.request(options, &r)
 	if err != nil {
 		return nil, err
 	}
-	if r.Code != 200 {
+	if r.GetCode() != 200 {
 		return nil, fmt.Errorf("request error")
 	}
-	return r, nil
+	return &r, nil
 }
 
 // DeleteCallbackURL delete a particular callback url
-func (c *Client) DeleteCallbackURL(uri string) (*Response, error) {
+func (c *Client) DeleteCallbackURL(uri string) (*DefaultResponse, error) {
+	var r DefaultResponse
+
 	options := &RequestOptions{
 		Path:   "eventSubscriptions",
 		Method: "DELETE",
@@ -47,10 +53,10 @@ func (c *Client) DeleteCallbackURL(uri string) (*Response, error) {
 			CallbackURL: url.QueryEscape(uri),
 		},
 	}
-	r, err := c.request(options)
-	if r != nil {
-		if r.Code == 204 {
-			return r, nil
+	err := c.request(options, &r)
+	if &r != nil {
+		if r.GetCode() == 204 {
+			return &r, nil
 		}
 	}
 	return nil, err

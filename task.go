@@ -5,31 +5,34 @@ import (
 )
 
 // ListTasks get all the tasks running on the cluster
-func (c *Client) ListTasks() (*Response, error) {
+func (c *Client) ListTasks() (*DefaultResponse, error) {
+	var r DefaultResponse
 	options := &RequestOptions{
 		Path: "tasks",
 	}
-	r, err := c.request(options)
+	err := c.request(options, &r)
 	if err != nil {
 		return nil, err
 	}
-	return r, nil
+	return &r, nil
 }
 
 // GetAppTasks get the tasks across the cluster from the appid
-func (c *Client) GetAppTasks(appID string) (*Response, error) {
+func (c *Client) GetAppTasks(appID string) (*DefaultResponse, error) {
+	var r DefaultResponse
 	options := &RequestOptions{
 		Path: fmt.Sprintf("apps/%s/tasks", appID),
 	}
-	r, err := c.request(options)
+	err := c.request(options, &r)
 	if err != nil {
 		return nil, err
 	}
-	return r, nil
+	return &r, nil
 }
 
 // KillTasks will kill the tasks from the host for the appid
-func (c *Client) KillTasks(appID string, host string, scale bool) (*Response, error) {
+func (c *Client) KillTasks(appID string, host string, scale bool) (*DefaultResponse, error) {
+	var r DefaultResponse
 	options := &RequestOptions{
 		Path:   fmt.Sprintf("apps/%s/tasks", appID),
 		Method: "DELETE",
@@ -38,17 +41,18 @@ func (c *Client) KillTasks(appID string, host string, scale bool) (*Response, er
 			Scale: scale,
 		},
 	}
-	r, err := c.request(options)
-	if r != nil {
-		if r.Code == 204 {
-			return r, nil
+	err := c.request(options, &r)
+	if &r != nil {
+		if r.GetCode() == 204 {
+			return &r, nil
 		}
 	}
 	return nil, err
 }
 
 // KillTask kill a particular taskid
-func (c *Client) KillTask(appID string, taskID string, scale bool) (*Response, error) {
+func (c *Client) KillTask(appID string, taskID string, scale bool) (*DefaultResponse, error) {
+	var r DefaultResponse
 	options := &RequestOptions{
 		Path:   fmt.Sprintf("apps/%s/tasks/%s", appID, taskID),
 		Method: "DELETE",
@@ -56,10 +60,10 @@ func (c *Client) KillTask(appID string, taskID string, scale bool) (*Response, e
 			Scale: scale,
 		},
 	}
-	r, err := c.request(options)
-	if r != nil {
-		if r.Code == 204 {
-			return r, nil
+	err := c.request(options, &r)
+	if &r != nil {
+		if r.GetCode() == 204 {
+			return &r, nil
 		}
 	}
 	return nil, err

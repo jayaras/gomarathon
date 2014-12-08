@@ -1,5 +1,7 @@
 package gomarathon
 
+import "encoding/json"
+
 // RequestOptions passed for query api
 type RequestOptions struct {
 	Method string
@@ -14,27 +16,80 @@ type Parameters struct {
 	Host        string
 	Scale       bool
 	CallbackURL string
-	Force       bool  `json:"force"`
+	Force       bool `json:"force"`
+}
+
+// is there a better way to handle the return code storage?
+// I don't think an interface can specify a field
+type Response interface {
+	SetCode(int)
+	GetCode() int
+	UnmarshalJSON([]byte) error
 }
 
 // Response representation of a full marathon response
-type Response struct {
-	Code     int
+type DefaultResponse struct {
+	code     int
 	Apps     []*Application `json:"apps,omitempty"`
 	App      *Application   `json:"app,omitempty"`
 	Versions []string       `json:",omitempty"`
 	Tasks    []*Task        `json:"tasks,omitempty"`
 }
 
-//
-type Group struct {
-	ID						string           `json:"id"`
-	Version				string           `json:"version,omitempty"`
-	Apps					[]*Application   `json:"apps,omitempty"`
-	Dependencies  []string         `json:"dependencies,omitempty"`
-	Groups				[]*Group         `json:"groups,omitempty"`
+func (r *DefaultResponse) SetCode(code int) {
+	r.code = code
 }
 
+func (r *DefaultResponse) GetCode() int {
+	return r.code
+}
+
+func (r *DefaultResponse) UnmarshalJSON(data []byte) error {
+
+	return json.Unmarshal(data, r)
+
+}
+
+type DeploymentResponse struct {
+	Deployments []Deployment
+	code        int
+}
+
+func (r *DeploymentResponse) SetCode(code int) {
+	r.code = code
+}
+
+func (r *DeploymentResponse) GetCode() int {
+	return r.code
+}
+
+func (r *DeploymentResponse) UnmarshalJSON(data []byte) error {
+	return json.Unmarshal(data, &r.Deployments)
+}
+
+type Deployment struct {
+	AffectedApps   []string           `json:"affectedApps,omitempty"`
+	ID             string             `json:"id,omitempty"`
+	Steps          []DeploymentAction `json:"steps,omitempty"`
+	CurrentActions []DeploymentAction `json:"currentActions,omitempty"`
+	Version        string             `json:"version,omitempty"`
+	CurrentStep    int                `json:"currentStep,omitempty"`
+	TotalSteps     int                `json:"totalSteps,omitempty"`
+}
+
+type DeploymentAction struct {
+	Action string `json:"action,omitempty"`
+	App    string `json:"app,omitempty"`
+}
+
+//
+type Group struct {
+	ID           string         `json:"id"`
+	Version      string         `json:"version,omitempty"`
+	Apps         []*Application `json:"apps,omitempty"`
+	Dependencies []string       `json:"dependencies,omitempty"`
+	Groups       []*Group       `json:"groups,omitempty"`
+}
 
 // Application marathon application see :
 // https://mesosphere.github.io/marathon/docs/rest-api.html#apps
@@ -46,7 +101,7 @@ type Application struct {
 	CPUs            float32           `json:"cpus,omitempty"`
 	Env             map[string]string `json:"env,omitempty"`
 	Executor        string            `json:"executor,omitempty"`
-	HealthChecks     []*HealthCheck    `json:"healthChecks,omitempty"`
+	HealthChecks    []*HealthCheck    `json:"healthChecks,omitempty"`
 	Instances       int               `json:"instances,omitemptys"`
 	Mem             float32           `json:"mem,omitempty"`
 	Tasks           []*Task           `json:"tasks,omitempty"`
@@ -58,7 +113,7 @@ type Application struct {
 	UpgradeStrategy *UpgradeStrategy  `json:"upgradeStrategy,omitempty"`
 	Uris            []string          `json:"uris,omitempty"`
 	Version         string            `json:"version,omitempty"`
-	Dependencies  []string            `json:"dependencies,omitempty"`
+	Dependencies    []string          `json:"dependencies,omitempty"`
 }
 
 // Container is docker parameters
@@ -70,17 +125,17 @@ type Container struct {
 
 // Docker options
 type Docker struct {
-	Image string `json:"image,omitempty"`
-	Network string `json:"network,omitempty"`
+	Image        string         `json:"image,omitempty"`
+	Network      string         `json:"network,omitempty"`
 	PortMappings []*PortMapping `json:"portMappings,omitempty"`
 }
 
 //Docker portmapping
 type PortMapping struct {
-  ContainerPort int `json:"containerPort"`
-	HostPort int `json:"hostPort"`
-	Protocol string `json:"protocol,omitempty"`
-	ServicePort int `json:"servicePort,omitempty"`
+	ContainerPort int    `json:"containerPort"`
+	HostPort      int    `json:"hostPort"`
+	Protocol      string `json:"protocol,omitempty"`
+	ServicePort   int    `json:"servicePort,omitempty"`
 }
 
 // Container volumes
@@ -98,13 +153,13 @@ type UpgradeStrategy struct {
 // HealthChecks are described here:
 // https://mesosphere.github.io/marathon/docs/health-checks.html
 type HealthCheck struct {
-	Protocol           string `json:"protocol,omitempty"`
-	Path               string `json:"path,omitempty"`
-	GracePeriodSeconds int    `json:"gracePeriodSeconds,omitempty"`
-	IntervalSeconds    int    `json:"intervalSeconds,omitempty"`
-	PortIndex          int    `json:"portIndex,omitempty"`
-	TimeoutSeconds     int    `json:"timeoutSeconds,omitempty"`
-	MaxConsecutiveFailures int `json:"maxConsecutiveFailures,omitempty"`
+	Protocol               string `json:"protocol,omitempty"`
+	Path                   string `json:"path,omitempty"`
+	GracePeriodSeconds     int    `json:"gracePeriodSeconds,omitempty"`
+	IntervalSeconds        int    `json:"intervalSeconds,omitempty"`
+	PortIndex              int    `json:"portIndex,omitempty"`
+	TimeoutSeconds         int    `json:"timeoutSeconds,omitempty"`
+	MaxConsecutiveFailures int    `json:"maxConsecutiveFailures,omitempty"`
 }
 
 // Task is described here:
